@@ -79,6 +79,11 @@ The application uses a **Greedy Priority-Based Strategy**:
 }
 ```
 
+## API Documentation (Swagger UI)
+Interactive API documentation is available when the application is running:
+-   **URL**: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+-   **Features**: View all endpoints, schemas, and test APIs directly from the browser.
+
 ## How to Run
 
 1.  **Build the project:**
