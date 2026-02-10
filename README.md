@@ -3,22 +3,30 @@
 A Spring Boot application that optimizes the allocation of delivery orders to a fleet of vehicles based on their locations, capacity, and priority. This system minimizes total travel distance using a greedy strategy and the Haversine formula.
 
 ## Features
-
--   **Order Management**: Ingest delivery orders with priority (HIGH, MEDIUM, LOW).
--   **Vehicle Management**: Track fleet status, location, and capacity.
 -   **Intelligent Dispatching**:
-    -   Assigns orders based on **Priority first**.
-    -   Minimizes travel distance using the **Haversine formula**.
-    -   Ensures vehicle capacity is not exceeded.
--   **Clean Architecture**: Follows Controller-Service-Repository pattern with Strategy Pattern for dispatch logic.
+    -   **Priority-First**: High-priority orders are always considered first for assignment.
+    -   **Distance Minimization**: Uses the **Haversine formula** to find the nearest available vehicle.
+    -   **Capacity Management**: Strictly enforces vehicle capacity constraints.
+    -   **Unassigned Order Handling**: Gracefully handles and reports orders that cannot be assigned due to capacity limits.
+-   **Robust Architecture**:
+    -   **Type-Safe Enums**: Uses `Priority` (HIGH, MEDIUM, LOW) for strict validation.
+    -   **Strategy Pattern**: Dispatch logic is encapsulated, allowing easy swapping of algorithms.
+    -   **DTO Pattern**: Clear separation between API contracts and internal domain entities.
+-   **Error Handling**: Global exception handling for validation errors and malformed requests.
 
 ## Technology Stack
-
 -   **Java 17+**
--   **Spring Boot 3.x**
--   **H2 Database** (In-Memory for simplicity)
--   **Spring Data JPA**
--   **JUnit 5 & Mockito** (Testing)
+-   **Spring Boot 3.3.2**
+-   **Spring Data JPA** & **H2 Database** (In-Memory)
+-   **JUnit 5**, **Mockito**, **MockMvc**
+
+## Algorithm Logic
+The application uses a **Greedy Priority-Based Strategy**:
+1.  **Sort Orders**: Orders are sorted primarily by Priority (HIGH > MEDIUM > LOW) and secondarily by weight.
+2.  **Find Best Vehicle**: For each order, the system iterates through all vehicles.
+3.  **Constraints**: Checks if the vehicle has enough remaining capacity.
+4.  **Optimization**: Calculates the Haversine distance from the vehicle's current location to the order's location.
+5.  **Assignment**: The order is assigned to the nearest valid vehicle. If no vehicle can fit the order, it is added to the `unassignedOrders` list.
 
 ## API Endpoints
 
@@ -57,7 +65,19 @@ A Spring Boot application that optimizes the allocation of delivery orders to a 
 
 ### 3. Get Dispatch Plan
 **GET** `/api/dispatch/plan`
-Response includes the optimized assignment of orders to vehicles.
+```json
+{
+  "dispatchPlan": [
+    {
+      "vehicleId": "VEH001",
+      "totalLoad": 10,
+      "totalDistance": "5.2 km",
+      "assignedOrders": [...]
+    }
+  ],
+  "unassignedOrders": []
+}
+```
 
 ## How to Run
 
@@ -74,14 +94,17 @@ Response includes the optimized assignment of orders to vehicles.
 
 ## Testing
 
-The project includes comprehensive Unit and Integration tests.
-To run tests:
+The project includes a comprehensive test suite with **100% pass rate** (13 tests):
+
+1.  **Unit Tests**: Verify the `PriorityDistanceStrategy` logic, including edge cases like:
+    -   Zero-distance orders.
+    -   Exact capacity matches.
+    -   Mixed priority handling.
+2.  **Integration Tests**:
+    -   **Assignment Dataset Verification**: A specific test (`DispatchIntegrationTest`) runs the **full 30-order dataset** provided in the assignment against the 5-vehicle fleet. It verifies that all orders are correctly processed and constraints are respected.
+
+To run the full suite:
 ```bash
 ./mvnw test
 ```
-
-## Architecture & Design Decisions
-
--   **Strategy Pattern:** The dispatch logic is encapsulated in `DispatchOptimizationStrategy`. The current implementation (`PriorityDistanceStrategy`) uses a greedy approach. This allows future extension to more complex algorithms (e.g., Genetic Algorithms) without modifying the core service.
--   **DTO Pattern:** Strict separation between internal Entities and external API DTOs.
--   **Exception Handling:** Global exception handler ensures consistent error responses.
+*Check the console output during testing to see the detailed dispatch plan for the assignment dataset.*
