@@ -1,6 +1,7 @@
 package com.dispatch.loadbalancer.service.strategy;
 
 import com.dispatch.loadbalancer.domain.OrderEntity;
+import com.dispatch.loadbalancer.domain.Priority;
 import com.dispatch.loadbalancer.domain.VehicleEntity;
 import com.dispatch.loadbalancer.dto.DispatchPlanResponse;
 import com.dispatch.loadbalancer.service.DistanceCalculator;
@@ -50,7 +51,7 @@ class PriorityDistanceStrategyTest {
                 OrderEntity order = OrderEntity.builder()
                                 .orderId("O1")
                                 .packageWeight(10)
-                                .priority("HIGH")
+                                .priority(Priority.HIGH)
                                 .latitude(1.0)
                                 .longitude(1.0)
                                 .build();
@@ -84,7 +85,7 @@ class PriorityDistanceStrategyTest {
                 OrderEntity order1 = OrderEntity.builder()
                                 .orderId("O1")
                                 .packageWeight(10)
-                                .priority("HIGH")
+                                .priority(Priority.HIGH)
                                 .latitude(1.0)
                                 .longitude(1.0)
                                 .build();
@@ -92,7 +93,7 @@ class PriorityDistanceStrategyTest {
                 OrderEntity order2 = OrderEntity.builder()
                                 .orderId("O2")
                                 .packageWeight(5)
-                                .priority("LOW")
+                                .priority(Priority.LOW)
                                 .latitude(2.0)
                                 .longitude(2.0)
                                 .build();

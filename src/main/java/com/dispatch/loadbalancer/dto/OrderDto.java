@@ -26,6 +26,5 @@ public class OrderDto {
     private Integer packageWeight;
 
     @NotNull(message = "Priority is required")
-    @jakarta.validation.constraints.Pattern(regexp = "HIGH|MEDIUM|LOW", message = "Priority must be HIGH, MEDIUM, or LOW")
-    private String priority; // validation can be added for Enum match
+    private com.dispatch.loadbalancer.domain.Priority priority;
 }

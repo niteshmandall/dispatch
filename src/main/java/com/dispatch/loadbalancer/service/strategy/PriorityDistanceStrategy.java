@@ -77,12 +77,7 @@ public class PriorityDistanceStrategy implements DispatchOptimizationStrategy {
     }
 
     private int getPriorityValue(OrderEntity order) {
-        return switch (order.getPriority().toUpperCase()) {
-            case "HIGH" -> 1;
-            case "MEDIUM" -> 2;
-            case "LOW" -> 3;
-            default -> 4;
-        };
+        return order.getPriority().getValue();
     }
 
     private static class VehicleState {
@@ -119,7 +114,7 @@ public class PriorityDistanceStrategy implements DispatchOptimizationStrategy {
                     .longitude(order.getLongitude())
                     .address(order.getAddress())
                     .packageWeight(order.getPackageWeight())
-                    .priority(order.getPriority())
+                    .priority(order.getPriority().name())
                     .build());
         }
 

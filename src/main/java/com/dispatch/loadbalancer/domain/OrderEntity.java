@@ -1,6 +1,8 @@
 package com.dispatch.loadbalancer.domain;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
@@ -32,5 +34,6 @@ public class OrderEntity {
     private Integer packageWeight;
 
     @NotNull
-    private String priority; // HIGH, MEDIUM, LOW
+    @Enumerated(EnumType.STRING)
+    private Priority priority;
 }

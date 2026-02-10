@@ -1,6 +1,7 @@
 package com.dispatch.loadbalancer.service;
 
 import com.dispatch.loadbalancer.domain.OrderEntity;
+import com.dispatch.loadbalancer.domain.Priority;
 import com.dispatch.loadbalancer.domain.VehicleEntity;
 import com.dispatch.loadbalancer.dto.DispatchPlanResponse;
 import com.dispatch.loadbalancer.dto.OrderRequest;
