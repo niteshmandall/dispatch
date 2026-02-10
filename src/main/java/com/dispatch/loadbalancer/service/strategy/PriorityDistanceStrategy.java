@@ -4,6 +4,7 @@ import com.dispatch.loadbalancer.domain.OrderEntity;
 import com.dispatch.loadbalancer.domain.VehicleEntity;
 import com.dispatch.loadbalancer.dto.AssignedOrder;
 import com.dispatch.loadbalancer.dto.DispatchPlanResponse;
+import com.dispatch.loadbalancer.dto.UnassignedOrder;
 import com.dispatch.loadbalancer.dto.VehicleDispatchPlan;
 import com.dispatch.loadbalancer.service.DistanceCalculator;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,8 @@ public class PriorityDistanceStrategy implements DispatchOptimizationStrategy {
         List<OrderEntity> sortedOrders = orders.stream()
                 .sorted(Comparator.comparingInt(this::getPriorityValue))
                 .toList();
+
+        List<UnassignedOrder> unassignedOrders = new ArrayList<>();
 
         // 2. Initialize tracking for vehicles
         Map<String, VehicleState> vehicleStates = new HashMap<>();
@@ -55,9 +58,10 @@ public class PriorityDistanceStrategy implements DispatchOptimizationStrategy {
             if (bestVehicle != null) {
                 bestVehicle.assignOrder(order, minAddedDistance);
             } else {
-                // Log or handle unassigned order
-                System.out.println(
-                        "Order " + order.getOrderId() + " mainly could not be assigned due to capacity limits.");
+                unassignedOrders.add(UnassignedOrder.builder()
+                        .orderId(order.getOrderId())
+                        .reason("No vehicle has sufficient capacity")
+                        .build());
             }
         }
 
@@ -68,6 +72,7 @@ public class PriorityDistanceStrategy implements DispatchOptimizationStrategy {
 
         return DispatchPlanResponse.builder()
                 .dispatchPlan(plans)
+                .unassignedOrders(unassignedOrders)
                 .build();
     }
 

@@ -21,95 +21,100 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class PriorityDistanceStrategyTest {
 
-    @Mock
-    private DistanceCalculator distanceCalculator;
+        @Mock
+        private DistanceCalculator distanceCalculator;
 
-    @InjectMocks
-    private PriorityDistanceStrategy strategy;
+        @InjectMocks
+        private PriorityDistanceStrategy strategy;
 
-    private List<OrderEntity> orders;
-    private List<VehicleEntity> vehicles;
+        private List<OrderEntity> orders;
+        private List<VehicleEntity> vehicles;
 
-    @BeforeEach
-    void setUp() {
-        orders = new ArrayList<>();
-        vehicles = new ArrayList<>();
-    }
+        @BeforeEach
+        void setUp() {
+                orders = new ArrayList<>();
+                vehicles = new ArrayList<>();
+        }
 
-    @Test
-    void testOptimize_AssignsOrdersCorrectly() {
-        // Arrange
-        VehicleEntity vehicle = VehicleEntity.builder()
-                .vehicleId("V1")
-                .capacity(100)
-                .currentLatitude(0.0)
-                .currentLongitude(0.0)
-                .build();
-        vehicles.add(vehicle);
+        @Test
+        void testOptimize_AssignsOrdersCorrectly() {
+                // Arrange
+                VehicleEntity vehicle = VehicleEntity.builder()
+                                .vehicleId("V1")
+                                .capacity(100)
+                                .currentLatitude(0.0)
+                                .currentLongitude(0.0)
+                                .build();
+                vehicles.add(vehicle);
 
-        OrderEntity order = OrderEntity.builder()
-                .orderId("O1")
-                .packageWeight(10)
-                .priority("HIGH")
-                .latitude(1.0)
-                .longitude(1.0)
-                .build();
-        orders.add(order);
+                OrderEntity order = OrderEntity.builder()
+                                .orderId("O1")
+                                .packageWeight(10)
+                                .priority("HIGH")
+                                .latitude(1.0)
+                                .longitude(1.0)
+                                .build();
+                orders.add(order);
 
-        when(distanceCalculator.calculateDistance(anyDouble(), anyDouble(), anyDouble(), anyDouble()))
-                .thenReturn(10.0);
+                when(distanceCalculator.calculateDistance(anyDouble(), anyDouble(), anyDouble(), anyDouble()))
+                                .thenReturn(10.0);
 
-        // Act
-        DispatchPlanResponse response = strategy.optimize(orders, vehicles);
+                // Act
+                DispatchPlanResponse response = strategy.optimize(orders, vehicles);
 
-        // Assert
-        assertNotNull(response);
-        assertEquals(1, response.getDispatchPlan().size());
-        assertEquals("V1", response.getDispatchPlan().get(0).getVehicleId());
-        assertEquals(10, response.getDispatchPlan().get(0).getTotalLoad());
-        assertEquals(1, response.getDispatchPlan().get(0).getAssignedOrders().size());
-    }
+                // Assert
+                assertNotNull(response);
+                assertEquals(1, response.getDispatchPlan().size());
+                assertEquals("V1", response.getDispatchPlan().get(0).getVehicleId());
+                assertEquals(10, response.getDispatchPlan().get(0).getTotalLoad());
+                assertEquals(1, response.getDispatchPlan().get(0).getAssignedOrders().size());
+        }
 
-    @Test
-    void testOptimize_RespectsCapacity() {
-        // Arrange
-        VehicleEntity vehicle = VehicleEntity.builder()
-                .vehicleId("V1")
-                .capacity(10)
-                .currentLatitude(0.0)
-                .currentLongitude(0.0)
-                .build();
-        vehicles.add(vehicle);
+        @Test
+        void testOptimize_RespectsCapacity() {
+                // Arrange
+                VehicleEntity vehicle = VehicleEntity.builder()
+                                .vehicleId("V1")
+                                .capacity(10)
+                                .currentLatitude(0.0)
+                                .currentLongitude(0.0)
+                                .build();
+                vehicles.add(vehicle);
 
-        OrderEntity order1 = OrderEntity.builder()
-                .orderId("O1")
-                .packageWeight(10)
-                .priority("HIGH")
-                .latitude(1.0)
-                .longitude(1.0)
-                .build();
+                OrderEntity order1 = OrderEntity.builder()
+                                .orderId("O1")
+                                .packageWeight(10)
+                                .priority("HIGH")
+                                .latitude(1.0)
+                                .longitude(1.0)
+                                .build();
 
-        OrderEntity order2 = OrderEntity.builder()
-                .orderId("O2")
-                .packageWeight(5)
-                .priority("LOW")
-                .latitude(2.0)
-                .longitude(2.0)
-                .build();
+                OrderEntity order2 = OrderEntity.builder()
+                                .orderId("O2")
+                                .packageWeight(5)
+                                .priority("LOW")
+                                .latitude(2.0)
+                                .longitude(2.0)
+                                .build();
 
-        orders.add(order1);
-        orders.add(order2);
+                orders.add(order1);
+                orders.add(order2);
 
-        when(distanceCalculator.calculateDistance(anyDouble(), anyDouble(), anyDouble(), anyDouble()))
-                .thenReturn(10.0);
+                when(distanceCalculator.calculateDistance(anyDouble(), anyDouble(), anyDouble(), anyDouble()))
+                                .thenReturn(10.0);
 
-        // Act
-        DispatchPlanResponse response = strategy.optimize(orders, vehicles);
+                // Act
+                DispatchPlanResponse response = strategy.optimize(orders, vehicles);
 
-        // Assert
-        assertEquals(1, response.getDispatchPlan().size());
-        assertEquals(10, response.getDispatchPlan().get(0).getTotalLoad()); // Only 10 assigned
-        assertEquals(1, response.getDispatchPlan().get(0).getAssignedOrders().size());
-        assertEquals("O1", response.getDispatchPlan().get(0).getAssignedOrders().get(0).getOrderId());
-    }
+                // Assert
+                assertEquals(1, response.getDispatchPlan().size());
+                assertEquals(10, response.getDispatchPlan().get(0).getTotalLoad()); // Only 10 assigned
+                assertEquals(1, response.getDispatchPlan().get(0).getAssignedOrders().size());
+                assertEquals("O1", response.getDispatchPlan().get(0).getAssignedOrders().get(0).getOrderId());
+
+                // Verify unassigned
+                assertNotNull(response.getUnassignedOrders());
+                assertEquals(1, response.getUnassignedOrders().size());
+                assertEquals("O2", response.getUnassignedOrders().get(0).getOrderId());
+        }
 }
